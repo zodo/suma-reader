@@ -1,13 +1,8 @@
 package com.sumareader.nfc
 
-import android.content.ContentValues
-import android.content.Context
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import com.sumareader.parser.BitUtils
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 private const val TAG = "CardDump"
 
@@ -49,31 +44,4 @@ object CardDump {
         }
     }
 
-    fun saveDump(context: Context, result: CardReader.ReadResult): String? {
-        val uidHex = BitUtils.bytesToHex(result.uid)
-        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val filename = "suma_${uidHex}_$timestamp.txt"
-
-        return try {
-            val values = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, filename)
-                put(MediaStore.Downloads.MIME_TYPE, "text/plain")
-                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-            }
-            val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-            if (uri != null) {
-                context.contentResolver.openOutputStream(uri)?.use { out ->
-                    out.write(formatDump(result).toByteArray())
-                }
-                Log.i(TAG, "Dump saved to Downloads/$filename")
-                filename
-            } else {
-                Log.e(TAG, "Failed to create file in Downloads")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to save dump", e)
-            null
-        }
-    }
 }
