@@ -209,7 +209,7 @@ fun HeroCard(card: SumaCard) {
                 // Balance badge: TUIN shows euros, others show trips
                 val badgeValue = when {
                     card.tuinBalanceCents != null -> "%.2f".format(card.tuinBalanceCents / 100.0)
-                    card.title != null && card.title.tripBalance > 0 -> "${card.title.tripBalance}"
+                    card.title != null -> "${card.title.tripBalance}"
                     else -> null
                 }
                 val badgeLabel = if (card.tuinBalanceCents != null) "EUR" else "trips"
